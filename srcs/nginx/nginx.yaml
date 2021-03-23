@@ -1,0 +1,72 @@
+apiVersion : apps/v1
+
+# k8s deployment object
+kind       : Deployment
+metadata   :
+  name  : nginx-deployment
+  # labels for future selection
+  labels:
+    app   : nginx
+    owner : aherlind
+spec:
+  # select pods
+  selector :
+    # choose with labels
+    matchLabels:
+      app: nginx
+  # pods template for creating
+  template:
+    metadata:
+      # labels for future selection
+      labels:
+        app     : nginx
+        owner   : aherlind
+    spec:
+      # configs for containers
+      containers:
+        - name            : nginx
+          # docker image for container
+          image           : nginx
+          # turn off pulling on DockerHub
+          imagePullPolicy : Never
+          # open ports in container
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+            - containerPort: 22
+---
+
+apiVersion: v1
+
+# k8s service object
+kind: Service
+metadata:
+  # service name
+  name  : nginx-service
+  # gives the right to use one ip
+  annotations:
+    metallb.universe.tf/allow-shared-ip: services
+  # labels for future selection
+  labels:
+    app: nginx
+    owner : aherlind
+spec:
+  # service type is LoadBalancer
+  type    : LoadBalancer
+  # select pods
+  selector:
+    app: nginx
+  ports:
+    - name      : http
+      protocol  : TCP
+      # Redirect ports from #
+      port      : 80
+      # Redirect port to #
+      targetPort: 80
+    - name      : https
+      protocol  : TCP
+      port      : 443
+      targetPort: 443
+    - name      : ssh
+      port      : 22
+      targetPort: 22

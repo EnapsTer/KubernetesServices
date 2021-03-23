@@ -1,0 +1,87 @@
+# Mandatory #
+apiVersion: v1
+
+# What type? #
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-pvc
+  # Additional information #
+  labels:
+      app   : influxdb
+      owner : aherlind
+spec:
+  # Acess rights #
+  accessModes:
+  - ReadWriteOnce
+   # Configs # 
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Mandatory #
+apiVersion: apps/v1
+
+# What type? #
+kind: Deployment
+metadata:
+  name: influxdb-deployment
+  # Additional information #
+  labels:
+    project: influxdb
+spec:
+  # How many replicas? #
+  replicas: 1
+  # Whats pods to choose? #
+  selector:
+    # Choose with labels: #
+    matchLabels:
+      project: influxdb
+  # Creating pods #
+  template:
+    metadata:
+      # Additional information #
+      labels:
+          project: influxdb
+    # Configs for containers #
+    spec:
+      # Include volume #
+      volumes:
+      - name: influxdb-volume
+        persistentVolumeClaim:
+          claimName: influxdb-pvc
+      containers:
+      - name: influxdb
+        # Image to be used #
+        image: influxdb:v1
+        # Turn of DockerHub #
+        imagePullPolicy: Never
+        # Open ports #
+        ports:
+        - containerPort: 8086
+        # Storage #
+        volumeMounts:
+        - mountPath: "/var/lib/influxdb"
+          name: influxdb-volume
+---
+# Mandatory #
+apiVersion: v1
+
+# What type? #
+kind: Service
+metadata:
+  name: influxdb-service
+  labels:
+      app  : influxdb
+      owner: aherlind
+spec:
+  # Access for other #
+  type: ClusterIP
+  # Access for what? #
+  selector:
+    project: influxdb
+  ports:
+    # Redirect ports from #
+  - name: http
+    port: 8086
+    # Redirect port to #
+    targetPort: 8086

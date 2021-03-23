@@ -1,0 +1,63 @@
+# Mandatory #
+apiVersion: apps/v1
+
+# What type? #
+kind: Deployment
+metadata:
+  name: phpmyadmin-deployment
+  # Additional information #
+  labels:
+    app  : phpmyadmin
+    owner: aherlind
+spec:
+  # How many replicas? #
+  replicas: 1
+  # Whats pods to choose? #
+  selector:
+    # Choose with labels: #
+    matchLabels:
+      project: phpmyadmin
+  # Creating pods #
+  template:
+    metadata:
+      labels:
+        project: phpmyadmin
+    # Configs for containers #
+    spec:
+      containers:
+      - name           : phpmyadmin
+        # Image to be used #
+        image          : phpmyadmin:v1
+        # Turn of DockerHub #
+        imagePullPolicy: Never
+        # Open ports #
+        ports:
+        - containerPort: 5000
+---
+# Mandatory #
+apiVersion: v1
+
+# What type? #
+kind: Service
+metadata:
+  name: phmyadmin-service
+  # Because everyone works on the same IP #
+  annotations:
+    metallb.universe.tf/allow-shared-ip: services
+   # Additional information #
+  labels:
+    app  : phpmyadmin
+    owner: aherlind
+spec:
+  # Include LoadBalancer #
+  type: LoadBalancer
+  # Whats pods to choose? #
+  selector:
+    # Choose with labels: #
+    project: phpmyadmin
+  ports:
+  - name      : http
+    # Redirect ports from #
+    port      : 5000
+    # Redirect port to #
+    targetPort: 5000

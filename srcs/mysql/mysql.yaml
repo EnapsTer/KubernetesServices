@@ -1,0 +1,88 @@
+apiVersion: v1
+
+# What type? #
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  # Additional information #
+  labels:
+      app  : mysql
+      owner: aherlind
+spec:
+  # Acess rights #
+  accessModes:
+  - ReadWriteOnce
+   # Configs # 
+  resources:
+    requests:
+      # Whats size? #
+      storage: 1Gi
+---
+apiVersion: apps/v1
+
+# What type? #
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  # Additional information #
+  labels:
+    app  : mysql
+    owner: aherlind
+spec:
+  # How many replicas? #
+  replicas: 1
+  # Whats pods to choose? #
+  selector:
+    # Choose with labels: #
+    matchLabels:
+      project: mysql
+  # Creating pods #
+  template:
+    metadata:
+      # Additional information #
+      labels:
+        project: mysql
+    # Configs for containers #
+    spec:
+      # Include volume #
+      volumes:
+      - name: mysql-volume
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      containers:
+      - name           : mysql
+        # Image to be used #
+        image          : mysql:v1
+        # Turn of DockerHub #
+        imagePullPolicy: Never
+        # Open ports #
+        ports:
+        - containerPort: 3306
+        # Storage #
+        volumeMounts   :
+        - mountPath: "/var/lib/mysql"
+          name     : mysql-volume
+---
+apiVersion: v1
+
+# What type? #
+kind: Service
+metadata:
+  name: mysql-service
+  # Additional information #
+  labels:
+      app  : mysql
+      owner: aherlind
+spec:
+  # Access for other #
+  type: ClusterIP
+  selector:
+    # Access for what? #
+    project: mysql
+  ports:
+  - name      : http
+    # Redirect ports from #
+    port      : 3306
+    # Redirect port to #
+    targetPort: 3306
+

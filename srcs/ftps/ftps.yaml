@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+
+# What type? #
+kind: Deployment
+metadata:
+    name: ftps-deployment
+     # Additional information #
+    labels:
+        app   : ftps
+        owner : aherlind
+spec:
+    # How many replicas? #
+    replicas: 1
+     # Whats pods to choose? #
+    selector:
+         # Choose with labels: #
+        matchLabels:
+            project: ftps
+    # Creating pods #
+    template:
+        metadata:
+            labels:
+                project: ftps
+                owner   : aherlind
+        spec:
+            # Configs for containers #
+            containers:
+                - name: ftps
+                  # Image to be used #
+                  image: ftps:v1
+                  # Turn of DockerHub #
+                  imagePullPolicy: Never
+                  # Open ports #
+                  ports:
+                      - containerPort: 21
+                      - containerPort: 21000
+---
+# Mandatory #
+apiVersion: v1
+
+# What type? #
+kind: Service
+metadata:
+    name: ftps-service
+    # Because everyone works on the same IP #
+    annotations:
+        metallb.universe.tf/allow-shared-ip: services
+    # Additional information #
+    labels:
+        app: ftps
+        owner : aherlind
+spec:
+    # Include LoadBalancer #
+    type: LoadBalancer
+    # Whats pods to choose? #
+    selector:
+        # Choose with labels: #
+        project: ftps
+    ports:
+        - name: ftps
+          # Redirect ports from #
+          port: 21
+          # Redirect port to #
+          targetPort: 21
+        - name: ftps-pasv
+          # Redirect ports from #
+          port: 21000
+          # Redirect port to #
+          targetPort: 21000

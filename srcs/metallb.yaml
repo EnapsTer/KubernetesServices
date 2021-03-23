@@ -1,0 +1,15 @@
+apiVersion: v1
+# config map is an API object used to store non-confidential data in key-value pairs
+kind: ConfigMap
+metadata:
+    # use metallb-system namespace for another objects
+    namespace : metallb-system
+    name      : config
+data:
+    # address pool for load balancer
+    config: |
+        address-pools:
+            - name      : default
+              protocol  : layer2
+              addresses :
+                  - 192.168.99.101-192.168.99.101
