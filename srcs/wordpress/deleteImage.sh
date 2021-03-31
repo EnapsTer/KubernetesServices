@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker rmi wordpress-nginx:v1
+docker rmi wordpress-nginx

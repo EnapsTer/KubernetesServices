@@ -1,64 +1,63 @@
-# Mandatory #
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind      : Deployment
 metadata:
   name: wordpress-deployment
-  # Additional information #
+  # labels for future selection
   labels:
     app  : wordpress
     owner: aherlind
 spec:
-  # How many replicas? #
-  replicas: 1
-  # Whats pods to choose? #
+  # select pods
   selector:
-    # Choose with labels: #
+    # choose with labels
     matchLabels:
-      project: wordpress
-  # Creating pods #
+      app: wordpress
+  # pods template for creating
   template:
     metadata:
       labels:
-        project: wordpress
-    # Configs for containers #
+        app: wordpress
+    # configs for containers
     spec:
       containers:
       - name           : wordpress
-        # Image to be used #
-        image          : wordpress-nginx:v1
-        # Turn of DockerHub #
+        # docker image for container
+        image          : wordpress-nginx
+        # turn off pulling on DockerHub
         imagePullPolicy: Never
-        # Open ports #
+        # open ports in container
         ports:
         - containerPort: 5050
+
 ---
-# Mandatory #
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
+  # service name
   name: wordpress-service
-  # Because everyone works on the same IP #
+  # gives the right to use one ip
   annotations:
     metallb.universe.tf/allow-shared-ip: services
-   # Additional information #
+  # labels for future selection
   labels:
       app  : wordpress
       owner: aherlind
 spec:
-  # Include LoadBalancer #
+  # service type is LoadBalancer
   type: LoadBalancer
-  # Whats pods to choose? #
+  # select pods
   selector:
-    # Choose with labels: #
-    project: wordpress
+    # choose with labels
+    app: wordpress
   ports:
     - name      : http
       protocol  : TCP
-      # Redirect ports from #
+      # redirect incoming request from port
       port      : 5050
-      # Redirect port to #
+      # send incoming request to container with port
       targetPort: 5050

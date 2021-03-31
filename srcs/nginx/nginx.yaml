@@ -21,8 +21,8 @@ spec:
       labels:
         app     : nginx
         owner   : aherlind
+    # configs for containers
     spec:
-      # configs for containers
       containers:
         - name            : nginx
           # docker image for container
@@ -34,6 +34,7 @@ spec:
             - containerPort: 80
             - containerPort: 443
             - containerPort: 22
+
 ---
 
 apiVersion: v1
@@ -59,14 +60,18 @@ spec:
   ports:
     - name      : http
       protocol  : TCP
-      # Redirect ports from #
+      # redirect incoming request from port
       port      : 80
-      # Redirect port to #
+      # send incoming request to container with port
       targetPort: 80
     - name      : https
       protocol  : TCP
+      # redirect incoming request from port
       port      : 443
+      # send incoming request to container with port
       targetPort: 443
     - name      : ssh
+      # redirect incoming request from port
       port      : 22
+      # send incoming request to container with port
       targetPort: 22

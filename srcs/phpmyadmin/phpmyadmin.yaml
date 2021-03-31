@@ -1,63 +1,64 @@
-# Mandatory #
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind: Deployment
 metadata:
   name: phpmyadmin-deployment
-  # Additional information #
+  # labels for future selection
   labels:
     app  : phpmyadmin
     owner: aherlind
 spec:
-  # How many replicas? #
-  replicas: 1
-  # Whats pods to choose? #
+  # select pods
   selector:
-    # Choose with labels: #
+    # choose with labels
     matchLabels:
-      project: phpmyadmin
-  # Creating pods #
+      app: phpmyadmin
+  # pods template for creating
   template:
     metadata:
+      # labels for future selection
       labels:
-        project: phpmyadmin
-    # Configs for containers #
+        app: phpmyadmin
+        owner: aherlind
+    # configs for containers
     spec:
       containers:
-      - name           : phpmyadmin
-        # Image to be used #
-        image          : phpmyadmin:v1
-        # Turn of DockerHub #
-        imagePullPolicy: Never
-        # Open ports #
-        ports:
-        - containerPort: 5000
+        - name           : phpmyadmin
+          # docker image for container
+          image          : phpmyadmin:v1
+          # turn off pulling on DockerHub
+          imagePullPolicy: Never
+          # open ports in container
+          ports:
+            - containerPort: 5000
+
 ---
-# Mandatory #
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
+  # service name
   name: phmyadmin-service
-  # Because everyone works on the same IP #
+  # gives the right to use one ip
   annotations:
     metallb.universe.tf/allow-shared-ip: services
-   # Additional information #
+  # labels for future selection
   labels:
     app  : phpmyadmin
     owner: aherlind
 spec:
-  # Include LoadBalancer #
+  # service type is LoadBalancer
   type: LoadBalancer
-  # Whats pods to choose? #
+  # select pods
   selector:
-    # Choose with labels: #
-    project: phpmyadmin
+    # choose with labels
+    app: phpmyadmin
   ports:
-  - name      : http
-    # Redirect ports from #
-    port      : 5000
-    # Redirect port to #
-    targetPort: 5000
+    - name      : http
+      # redirect incoming request from port
+      port      : 5000
+      # send incoming request to container with port
+      targetPort: 5000

@@ -1,10 +1,10 @@
 FROM alpine:3.12.3
 
-# Installing packages.
-RUN	apk update && apk add supervisor nginx openssl openssh libc6-compat
+# installing packages
+RUN apk update
+RUN apk add supervisor nginx openssl openssh libc6-compat
 
 # creating folders for ssh and ssl
-RUN mkdir -p /run/nginx
 RUN mkdir -p /etc/nginx/.ssh
 RUN mkdir -p /etc/nginx/.ssl
 
@@ -21,8 +21,8 @@ RUN adduser -D -g 'aherlind' aherlind
 RUN echo "aherlind:pass" | chpasswd
 
 # setup nginx.conf for nginx.
-COPY ./src/nginx.conf ./etc/nginx/
-COPY ./src/my-nginx.conf /etc/nginx/conf.d/nginx.conf
+RUN mkdir -p /run/nginx
+COPY ./src/nginx.conf /etc/nginx/conf.d/default.conf
 
 # setup telegraph
 RUN wget https://dl.influxdata.com/telegraf/releases/telegraf-1.17.0_linux_amd64.tar.gz

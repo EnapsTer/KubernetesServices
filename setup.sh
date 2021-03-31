@@ -13,7 +13,7 @@ minikube addons enable metallb
 
 # -----------------
 
-# Prepare dokcer
+# Prepare docker
 
 eval $(minikube docker-env)
 
