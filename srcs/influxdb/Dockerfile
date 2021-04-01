@@ -1,5 +1,7 @@
 FROM alpine:3.12.3
 
+#TODO понять как взаимодействуют influxdb и telegraph
+
 # installing required packages.
 RUN apk update
 RUN apk add supervisor influxdb libc6-compat
@@ -12,7 +14,6 @@ COPY src/telegraf.conf /etc/telegraf/
 
 # setup  supervisord.
 COPY src/supervisord.conf /etc/
-COPY src/startSupervisord.sh /
 
 # open ports
 EXPOSE 8086
