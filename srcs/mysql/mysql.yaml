@@ -12,7 +12,7 @@ spec:
   # gives read write access in a single node
   accessModes:
   - ReadWriteOnce
-   # config
+  # config
   resources:
     requests:
       # storage size
