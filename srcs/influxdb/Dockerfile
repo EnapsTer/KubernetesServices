@@ -1,40 +1,21 @@
 FROM alpine:3.12.3
 
-# Installing required packages.
-
+# installing required packages.
 RUN apk update
-RUN apk add\
-	supervisor\
-	influxdb\
-	libc6-compat
+RUN apk add supervisor influxdb libc6-compat
 
-#-----------------------------
-
-# Installing telegraf
-
+# installing telegraf
 RUN wget https://dl.influxdata.com/telegraf/releases/telegraf-1.17.0_linux_amd64.tar.gz
 RUN tar -xf telegraf-1.17.0_linux_amd64.tar.gz --strip-components=2 -C /
 RUN rm telegraf-1.17.0_linux_amd64.tar.gz
 COPY src/telegraf.conf /etc/telegraf/
 
-#-----------------------------
-
-
-# Setup supervisord.conf for supervisord.
-
+# setup  supervisord.
 COPY src/supervisord.conf /etc/
 COPY src/startSupervisord.sh /
 
-#-----------------------------
-
-# Open ports
-
+# open ports
 EXPOSE 8086
 
-#-----------------------------
-
-# Final command
-
-CMD /startSupervisord.sh
-
-#-----------------------------
+# start supervisord
+CMD supervisord

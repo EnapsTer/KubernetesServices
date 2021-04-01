@@ -1,87 +1,96 @@
-# Mandatory #
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: PersistentVolumeClaim
 metadata:
   name: influxdb-pvc
-  # Additional information #
+  # labels for future selection
   labels:
       app   : influxdb
       owner : aherlind
 spec:
-  # Acess rights #
+  # gives read write access in a single node
   accessModes:
   - ReadWriteOnce
-   # Configs # 
+    # config
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
+
 ---
-# Mandatory #
+
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind: Deployment
 metadata:
   name: influxdb-deployment
-  # Additional information #
+  # labels for future selection
   labels:
-    project: influxdb
+    app: influxdb
 spec:
-  # How many replicas? #
-  replicas: 1
-  # Whats pods to choose? #
+  # pods updating strategy
+  strategy:
+    # type RollingUpdate updates pods smoothly
+    type: RollingUpdate
+    rollingUpdate:
+      # maximum count of unavailable pods
+      maxUnavailable: 1
+      # over the desired amount of pods
+      maxSurge: 1
+  # select pods
   selector:
-    # Choose with labels: #
+    # choose with labels
     matchLabels:
-      project: influxdb
-  # Creating pods #
+      app: influxdb
+  # pods template for creating
   template:
     metadata:
-      # Additional information #
+      # labels for future selection
       labels:
           project: influxdb
-    # Configs for containers #
+    # configs for containers
     spec:
-      # Include volume #
+      # use volume
       volumes:
       - name: influxdb-volume
         persistentVolumeClaim:
           claimName: influxdb-pvc
       containers:
       - name: influxdb
-        # Image to be used #
+        # docker image for container
         image: influxdb:v1
-        # Turn of DockerHub #
+        # turn off pulling on DockerHub
         imagePullPolicy: Never
-        # Open ports #
+        # open ports in container
         ports:
         - containerPort: 8086
-        # Storage #
+        # mount storage path
         volumeMounts:
         - mountPath: "/var/lib/influxdb"
           name: influxdb-volume
+
 ---
-# Mandatory #
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
   name: influxdb-service
+  # labels for future selection
   labels:
       app  : influxdb
       owner: aherlind
 spec:
-  # Access for other #
+  # type ClusterIp gives access to another services
   type: ClusterIP
-  # Access for what? #
+  # choose with labels
   selector:
-    project: influxdb
+    app: influxdb
   ports:
-    # Redirect ports from #
   - name: http
+    # redirect incoming request from port
     port: 8086
-    # Redirect port to #
+    # send incoming request to container with port
     targetPort: 8086

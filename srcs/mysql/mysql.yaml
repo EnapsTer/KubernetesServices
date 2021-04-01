@@ -87,8 +87,8 @@ metadata:
 spec:
   # type ClusterIp gives access to another services
   type: ClusterIP
+  # choose with labels
   selector:
-    # gives access to mysql
     app: mysql
   ports:
   - name      : http
