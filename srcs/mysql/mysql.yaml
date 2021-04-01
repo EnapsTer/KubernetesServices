@@ -1,88 +1,98 @@
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: PersistentVolumeClaim
 metadata:
   name: mysql-pvc
-  # Additional information #
+  # labels for future selection
   labels:
       app  : mysql
       owner: aherlind
 spec:
-  # Acess rights #
+  # gives read write access in a single node
   accessModes:
   - ReadWriteOnce
-   # Configs # 
+   # config
   resources:
     requests:
-      # Whats size? #
+      # storage size
       storage: 1Gi
+
 ---
+
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind: Deployment
 metadata:
   name: mysql-deployment
-  # Additional information #
+  # labels for future selection
   labels:
     app  : mysql
     owner: aherlind
 spec:
-  # How many replicas? #
-  replicas: 1
-  # Whats pods to choose? #
+  # pods updating strategy
+  strategy:
+    # type RollingUpdate updates pods smoothly
+    type: RollingUpdate
+    rollingUpdate:
+      # maximum count of unavailable pods
+      maxUnavailable: 1
+      # over the desired amount of pods
+      maxSurge: 1
+  # select pods
   selector:
-    # Choose with labels: #
+    # choose with labels
     matchLabels:
-      project: mysql
-  # Creating pods #
+      app: mysql
+  # pods template for creating
   template:
     metadata:
-      # Additional information #
+      # labels for future selection
       labels:
-        project: mysql
-    # Configs for containers #
+        app: mysql
+    # configs for containers
     spec:
-      # Include volume #
+      # use volume
       volumes:
       - name: mysql-volume
         persistentVolumeClaim:
           claimName: mysql-pvc
       containers:
       - name           : mysql
-        # Image to be used #
-        image          : mysql:v1
-        # Turn of DockerHub #
+        # docker image for container
+        image          : mysql
+        # turn off pulling on DockerHub
         imagePullPolicy: Never
-        # Open ports #
+        # open ports in container
         ports:
         - containerPort: 3306
-        # Storage #
+        # mount storage path
         volumeMounts   :
         - mountPath: "/var/lib/mysql"
           name     : mysql-volume
+
 ---
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
   name: mysql-service
-  # Additional information #
+  # labels for future selection
   labels:
       app  : mysql
       owner: aherlind
 spec:
-  # Access for other #
+  # type ClusterIp gives access to another services
   type: ClusterIP
   selector:
-    # Access for what? #
-    project: mysql
+    # gives access to mysql
+    app: mysql
   ports:
   - name      : http
-    # Redirect ports from #
+    # redirect incoming request from port
     port      : 3306
-    # Redirect port to #
+    # send incoming request to container with port
     targetPort: 3306
-

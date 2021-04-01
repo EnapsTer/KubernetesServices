@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker rmi mysql:v1
+docker rmi mysql
