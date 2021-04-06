@@ -40,7 +40,10 @@ spec:
                   imagePullPolicy: Never
                   # open ports in container
                   ports:
+                      # for ftp
                       - containerPort: 21
+                      # TCP guarantees delivery of data packets on port 21000
+                      # in the same order in which they were sent
                       - containerPort: 21000
 
 ---

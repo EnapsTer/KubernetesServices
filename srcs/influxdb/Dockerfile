@@ -1,6 +1,6 @@
 FROM alpine:3.12.3
 
-# installing required packages.
+# installing packages
 RUN apk update
 RUN apk add supervisor influxdb libc6-compat
 

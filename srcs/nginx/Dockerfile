@@ -8,7 +8,7 @@ RUN apk add supervisor nginx openssl openssh libc6-compat
 RUN mkdir -p /etc/nginx/.ssh
 RUN mkdir -p /etc/nginx/.ssl
 
-# generate ssl.
+# generate ssl
 RUN	openssl req -x509 -nodes -days 365 \
 	-subj "/C=RU/ST=Moscow/O=Ft_servicesCompany, Inc./CN=ft_services.com" \
 	-addext "subjectAltName=DNS:aherlind.com" \
