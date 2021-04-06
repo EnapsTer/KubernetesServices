@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker rmi ftps:v1
+docker rmi ftps

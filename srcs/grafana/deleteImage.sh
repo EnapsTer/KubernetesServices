@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker rmi grafana:v1
+docker rmi grafana

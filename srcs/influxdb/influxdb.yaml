@@ -48,7 +48,7 @@ spec:
     metadata:
       # labels for future selection
       labels:
-          project: influxdb
+          app: influxdb
     # configs for containers
     spec:
       # use volume
@@ -59,7 +59,7 @@ spec:
       containers:
       - name: influxdb
         # docker image for container
-        image: influxdb:v1
+        image: influxdb
         # turn off pulling on DockerHub
         imagePullPolicy: Never
         # open ports in container

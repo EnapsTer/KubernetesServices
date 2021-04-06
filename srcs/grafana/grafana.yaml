@@ -1,62 +1,71 @@
-# Mandatory #
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind: Deployment
 metadata:
   name: grafana-deployment
+  # labels for future selection
   labels:
     app  : grafana
     owner: aherlind
 spec:
-  # How many replicas? #
-  replicas: 1
-  # Whats pods to choose? #
+  # pods updating strategy
+  strategy:
+    # type RollingUpdate updates pods smoothly
+    type: RollingUpdate
+    rollingUpdate:
+      # maximum count of unavailable pods
+      maxUnavailable: 1
+      # over the desired amount of pods
+      maxSurge: 1
+  # select pods
   selector:
-    # Choose with labels: #
+    # choose with labels
     matchLabels:
-      project: grafana
-  # Creating pods #
+      app: grafana
+  # pods creating template
   template:
     metadata:
+      # labels for future selection
       labels:
-        project: grafana
-    # Configs for containers #
+        app: grafana
+    # configs for containers
     spec:
       containers:
       - name: grafana
-        # Image to be used #
-        image: grafana:v1
-        # Turn of DockerHub #
+        # docker image for container
+        image: grafana
+        # turn off pulling on DockerHub
         imagePullPolicy: Never
-        # Open ports #
+        # open ports in container
         ports:
         - containerPort: 3000
+
 ---
-# Mandatory #
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
+  # service name
   name: grafana-service
-  # Because everyone works on the same IP #
+  # gives the right to use one ip
   annotations:
     metallb.universe.tf/allow-shared-ip: services
-   # Additional information #
+  # labels for future selection
   labels:
       app  : grafana
       owner: aherlind
 spec:
-  # Include LoadBalancer #
+  # service type is LoadBalancer
   type: LoadBalancer
-  # Whats pods to choose? #
+  # select pods
   selector:
-    # Choose with labels: #
-    project: grafana
+    app: grafana
   ports:
   - name: http
-    # Redirect ports from #
+    # redirect incoming request from port
     port: 3000
-    # Redirect port to #
+    # send incoming request to container with port
     targetPort: 3000

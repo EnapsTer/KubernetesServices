@@ -1,69 +1,78 @@
 apiVersion: apps/v1
 
-# What type? #
+# k8s deployment object
 kind: Deployment
 metadata:
     name: ftps-deployment
-     # Additional information #
+    # labels for future selection
     labels:
         app   : ftps
         owner : aherlind
 spec:
-    # How many replicas? #
-    replicas: 1
-     # Whats pods to choose? #
+    # pods updating strategy
+    strategy:
+        # type RollingUpdate updates pods smoothly
+        type: RollingUpdate
+        rollingUpdate:
+            # maximum count of unavailable pods
+            maxUnavailable: 1
+            # over the desired amount of pods
+            maxSurge: 1
+    # select pods
     selector:
-         # Choose with labels: #
+        # choose with labels
         matchLabels:
-            project: ftps
-    # Creating pods #
+            app: ftps
+    # pods creating template
     template:
         metadata:
+            # labels for future selection
             labels:
-                project: ftps
+                app: ftps
                 owner   : aherlind
+        # configs for containers
         spec:
-            # Configs for containers #
             containers:
                 - name: ftps
-                  # Image to be used #
-                  image: ftps:v1
-                  # Turn of DockerHub #
+                  # docker image for container
+                  image: ftps
+                  # turn off pulling on DockerHub
                   imagePullPolicy: Never
-                  # Open ports #
+                  # open ports in container
                   ports:
                       - containerPort: 21
                       - containerPort: 21000
+
 ---
-# Mandatory #
+
 apiVersion: v1
 
-# What type? #
+# k8s deployment object
 kind: Service
 metadata:
+    # service name
     name: ftps-service
-    # Because everyone works on the same IP #
+    # gives the right to use one ip
     annotations:
         metallb.universe.tf/allow-shared-ip: services
-    # Additional information #
+    # labels for future selection
     labels:
         app: ftps
         owner : aherlind
 spec:
-    # Include LoadBalancer #
+    # service type is LoadBalancer
     type: LoadBalancer
-    # Whats pods to choose? #
+    # select pods
     selector:
-        # Choose with labels: #
-        project: ftps
+        app: ftps
     ports:
         - name: ftps
-          # Redirect ports from #
+          # redirect incoming request from port
           port: 21
-          # Redirect port to #
+          # send incoming request to container with port
           targetPort: 21
         - name: ftps-pasv
-          # Redirect ports from #
+          # redirect incoming request from port
           port: 21000
-          # Redirect port to #
+          # send incoming request to container with port
           targetPort: 21000

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t influxdb:v1 srcs/influxdb/
+docker build -t influxdb srcs/influxdb/

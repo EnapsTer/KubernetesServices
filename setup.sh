@@ -1,5 +1,6 @@
 #!/bin/sh
-
+#TODO сделать минимум sh
+#TODO попросить подушить
 # Starting minikube
 
 minikube --driver=virtualbox --memory='3000' --disk-size 20000MB start
