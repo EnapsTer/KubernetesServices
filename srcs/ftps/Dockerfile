@@ -1,6 +1,5 @@
 FROM alpine:3.12.3
 
-#TODO полностью понять ftps доступ
 # installing packages
 RUN apk update
 RUN apk add vsftpd openssl libc6-compat supervisor
@@ -13,15 +12,16 @@ RUN tar -xf telegraf-1.18.0_linux_amd64.tar.gz --strip-components=2 -C /
 RUN rm telegraf-1.18.0_linux_amd64.tar.gz
 COPY src/telegraf.conf /etc/telegraf/
 
-#TODO разобраться с openssl и самим ssl
 # generate ssl
 RUN openssl req -x509 -nodes -days 365\
 	-subj "/C=RU/ST=Moscow/L=Moscow/O=Ft_servicesCompany, Inc./CN=ft_services.com"\
 	-addext "subjectAltName=DNS:aherlind.com"\
-	-newkey rsa:2048 -keyout /etc/vsftpd/aherlind.key -out /etc/vsftpd/aherlind.crt
+	-newkey rsa:2048\
+	-keyout /etc/vsftpd/aherlind.key\
+	-out /etc/vsftpd/aherlind.crt
 
-RUN adduser -D -g 'aherlind' aherlind
-RUN echo "aherlind:pass" | chpasswd
+RUN adduser -D aherlind
+RUN echo "aherlind:aherlind" | chpasswd
 
 # setup supervisord
 COPY src/supervisord.conf /etc/

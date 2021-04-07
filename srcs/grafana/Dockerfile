@@ -1,5 +1,5 @@
 FROM alpine:3.12.3
-# TODO полностью разобрать graphana
+
 # installing required packages.
 RUN apk update
 RUN apk add	libc6-compat supervisor
