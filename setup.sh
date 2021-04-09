@@ -1,6 +1,4 @@
 #!/bin/sh
-#TODO сделать минимум sh
-#TODO попросить подушить
 # Starting minikube
 
 minikube --driver=virtualbox --memory='3000' --disk-size 20000MB start
@@ -12,7 +10,6 @@ minikube addons enable metallb
 # Prepare docker
 eval $(minikube docker-env)
 
-#./srcs/build_all.sh && ./srcs/startServices.sh
 # Building docker-images
 docker build -t nginx srcs/nginx/
 docker build -t phpmyadmin srcs/phpmyadmin/
@@ -21,6 +18,7 @@ docker build -t mysql srcs/mysql/
 docker build -t influxdb srcs/influxdb/
 docker build -t grafana srcs/grafana/
 docker build -t ftps srcs/ftps/
+
 #Starting services
 kubectl apply -f srcs/metallb/metallb.yaml
 kubectl apply -f srcs/nginx/nginx.yaml
